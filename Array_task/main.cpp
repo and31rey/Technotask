@@ -16,7 +16,17 @@ int main()
 	
 	//cout << d.number_ << endl;
 	
-	Array<int> A();
+	Array<double> A(10);
+	A[5] = 10;
+	Array<double> B(10);
+	cout << "/////////////////// \n" << &B << endl;
+	B = A;
+	cout <<"/////////////////// \n" << &B << endl;
+
+	cout << "=================================================\n";
+	B.dump();
+	cout << "//////////////// \n" << &B << endl;
+	cout << B[5] << endl;
 	/*Vector<int> B(5);
 	Vector<int> C = A;
 	Vector<int> D;

@@ -6,9 +6,10 @@
 //! @brief Servic Macros Library
 //===============================================
 
+
 #ifndef __MACROS_H
 #define __MACROS_H
-
+#include <assert.h>
 static const bool TRUE    = true;
 static const bool FALSE   = false;
 static bool SERVICE       = TRUE;
