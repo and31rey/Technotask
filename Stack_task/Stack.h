@@ -1,4 +1,4 @@
-//===============================================
+п»ї//===============================================
 //! @file Stack.h
 //===============================================
 
@@ -12,262 +12,267 @@
 #include <iostream>
 #include <assert.h>
 #include <fstream>
-#include "ServiceLib.h"
-template <typename T>
+#include "Debug.h"
+#include "Array.h"
+#include "super_func.h"
 
+using std::cin;
+using std::cout;
+#ifndef ARRAY_H
+	static std::ofstream logfile;  //! Write in log.txt
+#endif
+
+const size_t CAPACITY = 6;
+
+template <typename T>
 class Stack 
 {
 	public:
 
-	//===========================================
-	//! @brief Standart constructor for static stack
-	//===========================================
+	//-------------------------------------------
+	//! @brief Default constructor.
+	//-------------------------------------------
 
 	Stack();
 
-	//===========================================
+	//-------------------------------------------
 	//! @brief Standart constructor for dynamic stack
-	//===========================================
+	//-------------------------------------------
 
-//	Stack(size_t capasity);
+//	Stack(size_t capacity);
 
-//  Stack(size_t capasity);
+//  Stack(size_t capacity);
 
 	~Stack();
 
-	//===========================================
-	//! @brief Pushes a value to the stack
-	//! @param value is an element to be pushed
-	//! @return succes of operation
-	//===========================================
+	//-------------------------------------------
+	//! @brief Pushes a value
+	//! @param value is an item to be pushed
+	//! @return success of operation
+	//-------------------------------------------
 
 	bool push(T value);
 
-	//===========================================
-	//! @brief Take the last element from the stack 
-	//! @return last element in the stack or NAN if stack empty
-	//===========================================
+	//-------------------------------------------
+	//! @brief Removes the top item
+	//! @return void
+	//-------------------------------------------
 
-	T pop();
+	void pop();
 
-	//===========================================
+	//-------------------------------------------
 	//! @brief Maximum number of elements to be pushed 
 	//! @return stack capasity
-	//===========================================
+	//-------------------------------------------
 
-	size_t capasity() const;
+	size_t capacity() const;
 
-	//===========================================
-	//! Show the last element of the stac
-	//! @return last element of stack
-	//===========================================
+	//-------------------------------------------
+	//! @return top element
+	//-------------------------------------------
 
-//	T peek(); //TODO
+//	T top(); //
 
-	//===========================================
+    //-------------------------------------------
 	//! @brief Information about stack
-	//! @detailed Send all info about stack in logfile.	
-	//===========================================
+	//! @detailed Send all info about stack to logfile.	
+	//-------------------------------------------
 
-	void dump() const;
+	void dump() ;
 
 
 	private:
 	
-	//===========================================
+    //-------------------------------------------
 	//! Silent validation
 	//! @return success to validation
-	//===========================================
+	//-------------------------------------------
 
-	bool ok() const;
+	bool ok();
 
-	//===========================================
-	//! @brief Information about stack
-	//! @detailed Send all info about stack in logfile.
-	//===========================================
-
-//	void dump() const;
-
-	//===========================================
+    //-------------------------------------------
     //! variables
-	//===========================================
-
-	static const size_t capasity_ = 6; //! maximum number of elements to be pushed 
-
-//	Static stack
-	T data_[capasity_]; //! data storage
+	//-------------------------------------------
+#ifndef ARRAY_H
+	size_t capacity_ = CAPACITY; //! maximum number of elements to be pushed 
+	T data_[CAPACITY]; //! data storage
+#endif
+	Array<int> data_;
 	size_t count_; //! counter
 
-
-/* Dynamic Stack
-	value_type data_; //! Data pointer
-	size_t count_;    //! Counter
-	size_t size_;     //! Stack capasity
-*/
 
 }; //! End of class stack
 
 
-   //===============================================
-   //! @brief Source code stack library.
-   //===============================================
-
    //-----------------------------------------------
-static const int POISON_INIT = 100500; //! Initialization const.
-static const double POISON_DEST = NAN;    //! Destruct const.
-										  //-----------------------------------------------
+   //! @brief Source code stack library
+   //-----------------------------------------------
+
+
+static const int POISON_INIT = 100500;    //! Initialization const
+static const size_t POISON_DEST = 0xFFFFFFFF;    //! Destruct const
+
+//-----------------------------------------------
 
 template <typename T>
-Stack<T>::Stack():
-	count_(0),
-	data_()
+Stack<T>::Stack() :
+	count_(0)
 {
-	PRINT("Стек инициализирован");
+	if (!logfile.is_open()) // 
+	{
+		logfile.open("log.txt", std::ios_base::app); //! Open file for addition info.
+		logfile << "==================================================================================================================================\n";
+	}
 	INFO
+	ASSERT_OK; //Exit verification
+	logfile << "Successfully\n" << "Stack adress = " << this;
+	logfile << "\n==================================================\n";
 }
 
 //-----------------------------------------------
 
-/*Stack::Stack(size_t capasity) :
-data_(new value_type[capasity]),
-count_(0),
-size_(size)
-{}
-*/
 template <typename T>
 Stack<T>::~Stack()
 {
+	if (!logfile.is_open()) // 
+		logfile.open("log.txt", std::ios_base::app); //! Open file for addition info.
+	INFO
+//	dump();
 	count_ = POISON_DEST;
-	for (size_t i = 0; i < capasity_; i++)
-		data_[i] = POISON_DEST;
-	PRINT("Стек уничтожен");
+//	for (size_t i = 0; i < data_.size(); i++)
+//		data_[i] = POISON_DEST;
+//	capacity_ = 0;
+//
+	data_.~Array();
+	cout << "~Destruct\n";
+//	logfile.close();
 }
 
 //-----------------------------------------------
+
+const double COEFFICIENT = 1.5;
+
 template <typename T>
 bool Stack<T>::push(T value)
 {
-	ASSERT_OK(); //! Entry verification
-
-	if (count_ >= capasity_)
-	{
-		ASSERT_OK(); //! Exit verification
+	cout << "Push was called\n";
+	INFO
+	ASSERT_OK; //! Entry verification
+	if (count_ >= data_.Size())
+/*	{
+		ASSERT_OK //! Exit verification
+		logfile << "Stack overflow, failed\n";
 		return false;
-	}
+	}*/
+		data_.ReSize(COEFFICIENT);
 	data_[count_++] = value;
-	WRITE("push", value)
-	dump();
-	ASSERT_OK(); //! Exit verification
+	ASSERT_OK //! Exit verification
+	logfile << "Successfully, value = " << value << '\n';
 	return true;
 }
 
 //-----------------------------------------------
 
 template <typename T>
-T Stack<T>::Stack::pop()
+void Stack<T>::Stack::pop()
 {
-	ASSERT_OK(); //! Entry verification
-	if (count_ == 0)
-	{
-		ASSERT_OK();
-		WRITE("pop NAN", 0)
-		return NAN; // Exit verification 
-	}
-	T result = data_[--count_];
-	WRITE("pop", result)
-	ASSERT_OK(); //! Exit verification
-	return result;
+	INFO
+	ASSERT_OK //! Entry verification
+		if (count_ <= 0)
+		{
+			ASSERT_OK; // Exit verification 
+			logfile << "Stack is empty, failed\n"; 
+		}
+	logfile << "Successfully, item has been removed = " << data_[count_--] << '\n';
+	ASSERT_OK; //! Exit verification
 }
 
 //-----------------------------------------------
 
 template <typename T>
-size_t Stack<T>::capasity() const
+size_t Stack<T>::capacity() const
 {
-	ASSERT_OK(); //! Verification
-	return capasity_;
+	ASSERT_OK; //! Verification
+	logfile << "Successfuly, stack capacity = " << data_.size() << '\n';
+	return data_.size();
 }
 
 //-----------------------------------------------
 
 template <typename T>
-bool Stack<T>::ok() const
+bool Stack<T>::ok() 
 {
-	return (count_ <= capasity_ || data_ != NULL);
+	return (data_.ok() && count_ <= data_.Size());
 }
 
+//-----------------------------------------------
 
+
+/*
 template <typename T>
-void Stack<T>::dump() const
-
+void Stack<T>::dump() 
 {
 
 	//-----------------------------------------------
-	bool correct = true;
-	char symbol ='*';
-#define DUMP(verif)															\
-	if (verif == true)														\
-		symbol = '*';													\
-	else																	\
-		symbol = ' ';													\
-	if (data_[i] != data_[i])												\
-	{																		\
-		correct = false;													\
-		log << symbol <<"[" << i << "] = " << data_[i] << "\t (Correct?)\n";			\
-	}													     				\
-	else if (data_[i] == POISON_INIT)										\
-	{																		\
-		correct = false;													\
-		log << symbol << "[" << i << "] = " << data_[i] << "\t (Poison?)\n";\
-	}																		\
-	else																	\
-	log << symbol << "[" << i << "] = " << data_[i] << '\n';
-
-	//-----------------------------------------------
-
-
-
-
-	std::ofstream log;  //! Write in log.txt
-	log.open("log.txt", std::ios_base::app); //! Open file for addition info.
-
-	log << "--------------------------------------------------\n\n";
-	log << "Info about stack." << '\n' << '\n';
-	log << "Stack max size = " << capasity_ << '\n';
-	log << "Amount of elements in the stack = " << count_ << '\t';
-	if (count_ <= capasity_)
+	bool correct = ok();
+	char symbol = '*';	     
+	logfile << "Stack max size = " << data_.Size() << '\n';
+	logfile << "Amount of elements in the stack = " << count_ << '\n';
+	logfile << "Stack adress = " << this << '\n';
+	if (correct)
 	{	//! Start first block.
-		log << "\n\n";
-		for (size_t i = 0; i < count_; i++) // Write data from the stack memory.
-		{	// Start first for .
-			DUMP(true)
-		} //! End first for.
-
-		for (size_t i = count_; i < capasity_; i++) // Write data from the memory off the stack.
-		{ // Start second for.
-			DUMP(false)
-		} //! End second for.
+		for (size_t i = 0; i < data_.Size(); i++) // Write data.
+		{	// Start  for .
+			if (i < count_)													     	
+				symbol = '*';													        
+			else																      
+				symbol = ' ';												          	
+			if (data_[i] != data_[i])												    
+			{																		    
+				correct = false;													    
+				logfile << symbol << "[" << i << "] = " << data_[i] << "\t (Correct?)\n";
+			}													     			       	
+			else if (data_[i] == POISON_INIT)										    
+			{																		    
+				correct = false;													    
+				logfile << symbol << "[" << i << "] = " << data_[i] << "\t (Poison?)\n";
+			}																	     	
+			else	
+			{																    
+				logfile << symbol << "[" << i << "] = " << data_[i] << '\n';
+			}
+			//-----------------------------------------------
+		} //! End for.
 	} //! End of first block.
-	else
-	{   //! Second block.
-		correct = false;
-		log << "Correct???\n\n";
-		for (size_t i = 0; i < capasity_; i++) // Write data from the memory off the stack.
-		{ // Start for.
-			DUMP(false)
-		} // End for. 
-	} // End if.
+	else 
+		logfile << "Stack has been destruct???\n\n";
 	if (correct != true)
-		log << "Stack is NOT OK\n";
+		logfile << "Stack is NOT OK\n";
 	else
-		log << "Stack is OK\n";
+		logfile << "Stack is OK\n";
 
-	log << "--------------------------------------------------\n\n";
-
-	log.close();
+	logfile << "\n==================================================\n";
 
 }
 
 //-----------------------------------------------
+*/
+
+template <typename T>
+void Stack<T>::dump()
+{
+	INFO
+	//-----------------------------------------------
+	bool correct = ok();
+	logfile << "Amount of elements in the stack = " << count_ << '\n';
+	logfile << "Stack adress = " << this << '\n';
+	data_.dump();
+	if (correct != true)
+		logfile << "Stack is NOT OK\n";
+	else
+		logfile << "Stack is OK\n";
+
+	logfile << "\n==================================================\n";
+}
 
 #endif

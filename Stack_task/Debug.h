@@ -14,7 +14,7 @@
 #define __DEBUG_H
 #include <assert.h>
 #include <iostream>
-#include "superfunc.h"
+//#include "superfunc.h"
 
 using std::cin;
 using std::cout;
@@ -32,16 +32,22 @@ using std::cout;
 	#define ASSERT_OK			     	\
 		if (!ok())						\
 		{								\
-			dump();						\
+			dump();	                    \
+			if (logfile.is_open())      \
+			{						    \
+				logfile.close();        \
+			}         				    \
 			assert (!"Object is OK");	\
-		}
+		}                               
 #else                               
-	#define ASSERT_OK() ;                                
+	#define ASSERT_OK       ;                              
 #endif
 
 //-----------------------------------------------
 
-#define INFO std::cout << __FUNCTION__, __FILE__, __LINE__ << '\n';
+#define INFO logfile << "==================================================\n";                  \
+			 logfile << __FUNCSIG__ << '\n' << __FILE__ << '\n' <<"line = " << __LINE__ << '\n'; \
+			 logfile <<"--------------------------------------------------" << "\n\n";             
 
 //-----------------------------------------------
 
@@ -49,10 +55,7 @@ using std::cout;
 
 //-----------------------------------------------
 
-#define WRITE(string, num)	std::ofstream log;							\
-	log.open("log.txt", std::ios_base::app);							\
-	log << "--------------------------------------------------\n\n";	\
-	log << string << num << '\n';										\
-	log.close();
+#define DUMP(var) var.dump(#var)
+
 #endif
 
